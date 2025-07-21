@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  otp-service:
+    build: .
+    image: myxl-otp-service:1.0
+    container_name: myxl-otp-service
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=5000
+      - DEBUG=false
+      - SECRET_KEY=strong_secret_key_axiata
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - BASE_URL=https://api.myxl.xlaxiata.co.id/ftth/api/v8/
+      - API_KEY=nskuuxz5xhz5fcyv5fpayt8r
+      - API_SECRET=xAf4bDJUxE
+      - API_PACKAGE=Default-Plan
+      - OTP_EXPIRY=300
+      - RATE_LIMIT=5 per minute
+      - LOG_FILE=/var/log/app.log
+    volumes:
+      - otp-logs:/var/log
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    container_name: myxl-otp-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --requirepass ${REDIS_PASSWORD:-}
+
+volumes:
+  redis-data:
+  otp-logs:
